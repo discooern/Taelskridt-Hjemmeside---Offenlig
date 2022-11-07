@@ -511,7 +511,7 @@ button{
 
 .inMenu{
   position: fixed;
-  overflow: scroll;
+  overflow-y: scroll;
   left: 0;
   right: 0;
 }
