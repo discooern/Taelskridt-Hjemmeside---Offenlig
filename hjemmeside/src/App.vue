@@ -482,6 +482,9 @@ const updateData = async () => {
   for (let i = 0; i < 5; i++) {
     try {
       // Top 5 Users
+      if (sortTop5User[i] == null) {
+        break;
+      }
       let tmpTeam = sortTop5User[i].team;
       if (sortTop5User[i].team == null) {
         tmpTeam = "Intet Hold";
@@ -493,10 +496,12 @@ const updateData = async () => {
         team: tmpTeam,
       };
     } catch (err) {
-    console.error("Failed to get top 5 users", err);
-    error.value = err;
+      console.error("Failed to get top 5 users", err);
+      error.value = err;
     }
+  }
 
+  for (let i = 0; i < 5; i++) {
     try {
       // Top 5 Classes
       itemTopClass[i] = {
@@ -504,10 +509,12 @@ const updateData = async () => {
         steps: sortTop5Class[i].steps,
       };
     } catch (err) {
-    console.error("Failed to get top 5 classes", err);
-    error.value = err;
+      console.error("Failed to get top 5 classes", err);
+      error.value = err;
     }
-
+  }
+  
+  for (let i = 0; i < 5; i++) {
     try {
       // Top 5 Teams
       itemTopTeam[i] = {
@@ -515,8 +522,8 @@ const updateData = async () => {
         steps: sortTop5Team[i].steps,
       };
     } catch (err) {
-    console.error("Failed to get top 5 teams", err);
-    error.value = err;
+      console.error("Failed to get top 5 teams", err);
+      error.value = err;
     }
   }
 };
