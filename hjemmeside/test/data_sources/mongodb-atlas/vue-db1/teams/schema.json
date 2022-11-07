@@ -1,0 +1,14 @@
+{
+    "properties": {
+        "_id": {
+            "bsonType": "objectId"
+        },
+        "steps": {
+            "bsonType": "int"
+        },
+        "teamName": {
+            "bsonType": "string"
+        }
+    },
+    "title": "team"
+}

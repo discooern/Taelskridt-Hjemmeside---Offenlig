@@ -1,0 +1,10 @@
+Refactor Kode,
+Reset Password,
+GDPR - slet bruger,
+Skeleton Loader,
+Reset Password,
+Refresh Token,
+
+Website for InfoScreen ? / Api
+
+Bug - Delete anonymous user on logout / anonymous user is permanently saved on db / expires after 90 days

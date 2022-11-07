@@ -1,0 +1,14 @@
+{
+    "properties": {
+        "_id": {
+            "bsonType": "objectId"
+        },
+        "className": {
+            "bsonType": "string"
+        },
+        "steps": {
+            "bsonType": "int"
+        }
+    },
+    "title": "class"
+}

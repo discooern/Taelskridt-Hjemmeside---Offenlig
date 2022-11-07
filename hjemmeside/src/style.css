@@ -1,0 +1,517 @@
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+.btn {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+.btn:hover, .popupBtn:hover {
+  border-color: #40bf6e;
+}
+.btn:focus,
+.btn:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+.popupBtn:focus,
+.popupBtn:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+.card {
+  padding: 2em;
+}
+
+.personalSteps{
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.circleProgressFlex{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.circleProgressPercent{
+  display: flex;
+  position: absolute;
+  font-size: 2.4rem;
+  font-weight: bold;
+}
+
+.logonContainerSize{
+  width: 20rem;
+  height: 20rem;
+}
+
+.viewLogs{
+  max-height: 25rem;
+  overflow-y: scroll;
+}
+
+.logonUserBtnContainer > .btn:hover, .createUserBtnContainer > .btnSaveNewUser:hover, .addStepsBtnContainer > .addStepsBtn:hover {
+  border: 2px solid #00792c;
+}
+
+.viewLogs > .vue3-easy-data-table__main > table > .vue3-easy-data-table__body > tr > .direction-left, .viewLogs > .vue3-easy-data-table__main > table > .vue3-easy-data-table__header > tr > th > .direction-left{
+  padding: 0.3rem .4rem;
+}
+
+.viewLogs > .vue3-easy-data-table__main > table > .vue3-easy-data-table__body > tr > td:nth-child(2){
+  column-width: 100px;
+}
+
+.viewLogs > .vue3-easy-data-table__main > table > .vue3-easy-data-table__body > tr > td:nth-child(2){
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.logon_Steps_Container{
+  background:rgba(255, 255, 255, 1);
+  padding: 2rem;
+  border: 4px solid #40bf6e;
+  border-radius: 40px;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  padding: 4rem 6rem;
+  text-align: center;
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,250,238,1) 75%);
+}
+
+@media screen and (max-width: 600px){
+  .app > .headerNav{
+    flex-direction: column;
+    height: fit-content;
+  }
+  .direction-left{
+    padding: .2rem .5rem;
+  }
+  .settingsBtn{
+    width: 10vw;
+  }
+  .logon_Steps_Container{
+    width: 80%;
+  }
+  .logonUserBtnContainer > .btn, .createUserBtnContainer > .btn, .addStepsBtnContainer > .btn, .headerBtnContainer > .btn, .deleteUserBtnContainer > .btn{
+    height: fit-content;
+  }
+}
+@media screen and (max-width: 920px){
+  .app{
+    padding: 0rem;
+  }
+  .app > .headerNav{
+    padding: 0.5rem;
+  }
+  .app > .headerNav > .headerLogoContainer > .headerTitle{
+    margin: 0;
+  }
+  .circleProgressFlex{
+    width: 150px;
+    height: 150px;
+  }
+  .circleProgressPercent{
+    height: 120px;
+  }
+  .circleProgressTodaySteps > .personalStepsP{
+    font-size: 1.3rem;
+  }
+}
+@media screen and (min-width: 601px){
+  .direction-left{
+    padding: .2rem 4vw;
+  }
+}
+
+.addStepsDescContainer{
+  display: flex;
+  justify-content: space-around;
+}
+
+.headerNav{
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 5px;
+  height: 80px;
+  padding: 0 5rem;
+  background:rgba(62,190,114,255);
+}
+
+.passwordResetLink:visited{
+  color: black;
+}
+
+.passwordResetLink:hover{
+  cursor: pointer;
+  color: rgb(0, 52, 223);
+}
+
+.passwordResetLink{
+  text-decoration: underline;
+  position: absolute;
+  left: 3.5rem;
+  bottom: 43%;
+}
+
+.top5P, .teamP, .classP, .personalStepsP, .personalP{
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.top5P, .teamP, .classP, .personalP{
+  border-bottom: 4px solid #40bf6e;
+  padding: .5rem;
+  width: 12rem;
+}
+
+.nameCol{
+  display: flex;
+  flex-direction: column;
+}
+
+.headerContainer, .itemContainer, .vs__dropdown-toggle{
+  display: flex;
+}
+
+.mainHeaderText{
+  width: 13rem;
+  height: 1.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin: 0 5px;
+  background: #40bf6e;
+}
+
+.mainItemText{
+  width: 13rem;
+  height: 1.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  margin: 0 5px;
+}
+
+.vs__selected{
+  position: absolute;   
+  left: 1.2rem;
+  top: 0.1rem;
+}
+
+.header{
+  background:rgba(62,190,114,255);
+  border-radius: 5px;
+  font-size: 1.2rem;
+}
+
+.top5People, .yourTeam, .yourClass, .topClass, .topTeam, .personalStats{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vs__selected-options, .vs__search{
+  width: 90%;
+}
+
+.vs__actions{
+  display:flex;
+  align-items: center;
+}
+
+.vs__clear{
+  margin-right: .5rem;
+  border-radius: 20px;
+}
+
+.dropdown{
+  position: relative;
+  z-index:5000000;
+}
+
+.vs__dropdown-menu{
+  background: white;
+  border-bottom: 2px solid #40bf6e;
+  border-left: 2px solid #40bf6e;
+  border-right: 2px solid #40bf6e;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin: 0;
+}
+
+.headerTitle{
+  font-size:30px;
+  font-weight: bold;
+  color:rgba(255, 255, 255);
+  margin-left: 3rem;
+}
+
+.headerLogo{
+  width: 4.5rem;
+}
+
+.textLogonName, .textLogonPassword, .textAddStepsAmount, .textAddStepsDesc, .textCreateName, .textCreateEmail, .textCreatePassword, .textCreateClass, .textCreateTeam, .textDeleteEmail, .textDeleteUsername{
+  border: 1px solid black;
+  width: 90%;
+}
+
+.popup{
+  height: 15rem;
+  width: 20rem;
+  border: 3px solid rgb(202, 0, 0);
+  border-radius: 20px;
+  background: white;
+}
+
+.popupText{
+  padding: 2rem;
+  height: 40%;
+  border-bottom: 3px solid rgb(202, 0, 0);
+}
+
+.popupBtn{
+  height: 15%;
+  width: 50%;
+  margin: 12px auto;
+  font-size: 1.2rem;
+  border-radius: 5px;
+  border: 2px solid black;
+  background: white;
+}
+
+.popupBlur{
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  top: 0;
+  right: 0;
+  background: rgba(128, 128, 128, .4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.direction-left.header{
+  display: flex;
+  justify-content: center;
+}
+
+.direction-left{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow:ellipsis;
+}
+
+.headerBtnContainer > .settingsBtn{
+  font-weight: lighter;
+}
+
+.settingsBtn{
+  padding: 0 .6vw;
+  font-size: 32px;
+}
+
+.even-row{
+  background: rgba(192, 192, 192, 0.178);
+}
+
+.viewLogsBtn, .deleteBtn{
+  margin-top: 20px;
+}
+
+.settingsMenu{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding-top: 3rem;
+}
+
+body{
+  margin: 0;
+}
+
+.body {
+  padding: 50px 0 0 0;
+  background: rgb(255,255,255);
+  background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,250,238,1) 75%);
+}
+
+.headerLogoContainer{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.headerBtnContainer {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 2px solid rgba(255,250,220,255);
+  border-radius: 5px;
+}
+
+.headerBtn{
+  margin: .7rem;
+}
+
+.mainContainer{
+  height: fit-content;
+  border-bottom: 2px solid #40bf6e;
+  border-radius: 3px;
+  padding: 1rem 0 2.5rem;
+}
+
+.optionalFont{
+  color:rgba(0, 0, 0, .4);
+  font-style: italic;
+}
+
+.datePick{
+  width: 94%;
+  margin: 7rem auto 0 auto;
+}
+
+.returnBtn{
+  position: absolute;
+  right: 2rem;
+  top: 2rem;
+  border-radius: 50px;
+  font-size: 16px;
+  width: 10px;
+  height: 10px;
+}
+
+.logonCreateUser > .inputBox > p{
+  margin: 6px;
+}
+
+.btnLogonUser, .redirectCreateUser, .btnSaveNewUser, .addStepsBtn, .btnDeleteUser{
+  border: 2px solid #40bf6e;
+  margin: 0 2px;
+}
+
+.btn {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 2.4rem;
+}
+
+.logonUserBtnContainer, .addStepsBtnContainer, .createUserBtnContainer, .deleteUserBtnContainer{
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  bottom: -1rem;
+  left: 3rem;
+  right: 3rem;
+}
+
+button{
+  background-color: #f9f9f9;
+}
+
+.confirmDeleteContainer > .confirmBtnDelete:hover{
+  border: 1px solid red;
+}
+
+.confirmBtnDelete{
+  color: red;
+}
+
+.confirmBtnDelete, .returnBtnDelete{
+  height: 50%;
+}
+
+.confirmP{
+  height: 20px;
+}
+
+.confirmDeleteContainer{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  width: 10rem;
+  height: 10rem;
+  border: 4px solid #40bf6e;
+  border-radius: 40px;
+  background-color: white;
+  padding: 1.5rem;
+}
+
+.logon_Steps_Blur{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:rgba(128, 128, 128, .4)
+}
+
+.inMenu{
+  position: fixed;
+  overflow: scroll;
+  left: 0;
+  right: 0;
+}
