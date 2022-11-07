@@ -20,7 +20,6 @@ async function loginAnonymous() {
   try {
     // Authenticate the user
     const anonymousUser = await app.logIn(credentials);
-    console.log("anonymousUser", anonymousUser)
     // `App.currentUser` updates to match the logged in user
     console.assert(anonymousUser.id === app.currentUser.id);
     return anonymousUser;
@@ -259,14 +258,11 @@ const deleteAccount = async () => {
     } else if (password.value == "" || password.value < 6) {
       openPopup("Ugyldigt kodeord, skal være mindst 6 tegn");
     } else {
-      console.log("in delete function")
       let tmpUserDelete = usersC.findOne({ username: username.value })
-      console.log(tmpUserDelete.name)
       if (
         tmpUserDelete != null &&
         app.currentUser.id == tmpUserDelete.userID
       ) {
-        console.log("username and email correct")
         // Updates the team the user is part of to remove their steps
         tmpUser = await usersC.findOne({ userID: app.currentUser.id });
         // Checks if user is part of a team since the value is nullable
@@ -496,7 +492,10 @@ const updateData = async () => {
         class: sortTop5User[i].class,
         team: tmpTeam,
       };
-    } catch { }
+    } catch (err) {
+    console.error("Failed to get top 5 users", err);
+    error.value = err;
+    }
 
     try {
       // Top 5 Classes
@@ -504,7 +503,10 @@ const updateData = async () => {
         className: sortTop5Class[i].className,
         steps: sortTop5Class[i].steps,
       };
-    } catch { }
+    } catch (err) {
+    console.error("Failed to get top 5 classes", err);
+    error.value = err;
+    }
 
     try {
       // Top 5 Teams
@@ -512,7 +514,10 @@ const updateData = async () => {
         teamName: sortTop5Team[i].teamName,
         steps: sortTop5Team[i].steps,
       };
-    } catch { }
+    } catch (err) {
+    console.error("Failed to get top 5 teams", err);
+    error.value = err;
+    }
   }
 };
 
