@@ -7,6 +7,7 @@ import vSelect from "vue-select";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import * as Realm from "realm-web";
+import { ContentLoader } from 'vue-content-loader'
 
 // Defines DB Connection
 new Realm.App({ id: "App ID" });
@@ -38,7 +39,7 @@ let logsC
 let teamsC
 let classesC
 
-async function setupLoginDB() {
+const setupLoginDB = async () => {
   const anonymousUser = await loginAnonymous();
   mongodb = app.currentUser.mongoClient("mongodb-atlas");
   usersC = mongodb.db("vue-db1").collection("users");
@@ -48,10 +49,11 @@ async function setupLoginDB() {
 }
 setupLoginDB();
 //#endregion
+
 //#region In App Variables
 const now = new Date();
 
-// Menu Open / 1 = logon / 2 = steps add / 3 = settings / 4 = createUser / 5 = viewLogs / 6 = deleteUser / 7 = confirmDelete
+// Menu Open / 1 = logon / 2 = steps add / 3 = settings / 4 = createUser / 5 = viewLogs / 6 = deleteUser / 7 = confirmDelete / 8 = resetPassword
 let screenOpenStatus = ref(0);
 let userLogged = ref(false);
 const disabledItems = ref(false);
@@ -140,8 +142,6 @@ const createAccountEmailPassword = async () => {
     // opensPopup if credentials are invalid else it runs the code as normal
     if (username.value == "") {
       openPopup("Ugyldigt brugernavn");
-    } else if (email.value == "") {
-      openPopup("Ugyldig Email");
     } else if (password.value == "" || password < 6) {
       openPopup("Ugyldigt kodeord, skal være mindst 6 tegn");
     } else if (
@@ -230,7 +230,7 @@ const loginEmailPassword = async () => {
           team: tmpUser.team,
         };
       }
-      calcPercentageToday();
+      await calcPercentageToday();
       updateData();
     }
   } catch (err) {
@@ -302,7 +302,7 @@ const createNewStepsLog = async () => {
     // opensPopup if credentials are invalid else it runs the code as normal
     if (Number(_steps.value) == 0 || _steps == String) {
       openPopup("Kan ikke tilføje ny antal skridt til brugeren hvis det er 0");
-    } else if (timeStampByUser.value == null) {
+    } else if (timeStampByUser.value == 0) {
       openPopup("Venligst indtast en dato");
     } else {
       // Awaits Response to insert an new log into the stepLogs(logsC) Collection
@@ -384,8 +384,18 @@ const viewLogsScreenToggle = async (num) => {
 };
 
 const resetPassword = async () => {
-  let email = "";
-  await app.emailPasswordAuth.sendResetPasswordEmail({ email });
+  try {
+    // opensPopup if credentials are invalid else it runs the code as normal
+    if (email.value == "") {
+      openPopup("Kan ikke sende link venligst indtast email");
+    } else {
+      await app.emailPasswordAuth.sendResetPasswordEmail(String(email.value));
+      menuScreenToggle(0)
+    }
+  } catch (err) {
+    console.error("Failed to send email", err);
+    error.value = err;
+  }
 };
 //#endregion
 
@@ -435,11 +445,11 @@ const updateData = async () => {
   //#endregion
 
   // Checks if there is a user logged and if its not anonymous
-  if (app.currentUser.customData.username != null) {
+  if (user.id != null) {
     // Sorts the top5 list from most to least steps
-    let tmpUser = await usersC.findOne({ userID: app.currentUser.id });
+    let tmpUser = await usersC.findOne({ userID: user.id });
     let yourClassMembers = await usersC.find({ class: tmpUser.class });
-    yourClassMembers.sort((a, b) => b.steps - a.steps);
+    await yourClassMembers.sort((a, b) => b.steps - a.steps);
 
     // Updates our currently logged users statistics
     loggedUser[0] = {
@@ -466,7 +476,7 @@ const updateData = async () => {
     // Sets the table containing your team members to update the content
     if (tmpUser.team != null) {
       let yourTeamMembers = await usersC.find({ team: tmpUser.team });
-      yourTeamMembers.sort((a, b) => b.steps - a.steps);
+      await yourTeamMembers.sort((a, b) => b.steps - a.steps);
 
       for (let i = 0; i < yourTeamMembers.length; i++) {
         itemTeam[i] = {
@@ -513,7 +523,7 @@ const updateData = async () => {
       error.value = err;
     }
   }
-  
+
   for (let i = 0; i < 5; i++) {
     try {
       // Top 5 Teams
@@ -528,8 +538,8 @@ const updateData = async () => {
   }
 };
 
-async function timer() {
-  updateData();
+const timer = async () => {
+
   const myTimeout = setInterval(updateData, 10000);
 }
 
@@ -594,24 +604,59 @@ timer();
         <div class="mainContainer top5People">
           <p class="top5P">Top 5</p>
           <easy-data-table :headers="header" :items="itemTop5" hide-footer alternating rows-per-page="5" />
+          <ContentLoader v-if="itemTop5[0].name == null" style="margin: 0 16%" viewBox="0 0 250 60">
+            <rect x="0" y="0" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="10" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="20" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="30" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="40" rx="3" ry="3" width="100%" height=".4rem" />
+          </ContentLoader>
         </div>
         <div class="mainContainer yourTeam" v-if="userLogged && loggedUser[0].team != null">
           <p class="teamP">Dit Hold</p>
           <easy-data-table :headers="header" :items="itemTeam" hide-footer alternating />
+          <ContentLoader v-if="itemTop5[0].name == null" style="margin: 0 16%" viewBox="0 0 250 60">
+            <rect x="0" y="0" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="10" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="20" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="30" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="40" rx="3" ry="3" width="100%" height=".4rem" />
+          </ContentLoader>
         </div>
         <div class="mainContainer yourClass" v-if="userLogged">
           <p class="classP">Din Klasse</p>
           <easy-data-table :headers="header" :items="itemClass" alternating hide-footer />
+          <ContentLoader v-if="itemTop5[0].name == null" style="margin: 0 16%" viewBox="0 0 250 60">
+            <rect x="0" y="0" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="10" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="20" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="30" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="40" rx="3" ry="3" width="100%" height=".4rem" />
+          </ContentLoader>
         </div>
 
         <div class="mainContainer topTeam">
           <p class="classP">Top Hold</p>
           <easy-data-table :headers="headerTeam" :items="itemTopTeam" alternating hide-footer rows-per-page="5" />
+          <ContentLoader v-if="itemTop5[0].name == null" style="margin: 0 16%" viewBox="0 0 250 60">
+            <rect x="0" y="0" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="10" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="20" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="30" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="40" rx="3" ry="3" width="100%" height=".4rem" />
+          </ContentLoader>
         </div>
 
         <div class="mainContainer topClass">
           <p class="classP">Top Klasser</p>
           <easy-data-table :headers="headerClass" :items="itemTopClass" alternating hide-footer rows-per-page="5" />
+          <ContentLoader v-if="itemTop5[0].name == null" style="margin: 0 16%" viewBox="0 0 250 60">
+            <rect x="0" y="0" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="10" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="20" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="30" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="40" rx="3" ry="3" width="100%" height=".4rem" />
+          </ContentLoader>
         </div>
       </div>
 
@@ -621,6 +666,7 @@ timer();
           logsScreenClass: screenOpenStatus == 5,
         }" v-if="screenOpenStatus > 0">
           <div class="addSteps" v-if="screenOpenStatus == 2">
+            <p class="p descText">Tilføj Skridt</p>
             <button class="btn returnBtn" @click="menuScreenToggle(0)">
               X
             </button>
@@ -636,6 +682,7 @@ timer();
               <input class="textAddStepsDesc" v-model="description" />
             </span>
             <span>
+              <p class="datePickP">Dato Opnået</p>
               <Datepicker v-model="timeStampByUser" class="datePick"></Datepicker>
             </span>
             <span class="addStepsBtnContainer">
@@ -645,6 +692,7 @@ timer();
             </span>
           </div>
           <div v-if="screenOpenStatus == 3">
+            <p class="p descText">Indstillinger</p>
             <button class="btn returnBtn" @click="menuScreenToggle(0)">
               X
             </button>
@@ -658,6 +706,7 @@ timer();
             </span>
           </div>
           <div v-if="screenOpenStatus == 5">
+            <p class="p descText">Skridt Logs</p>
             <button class="btn returnBtn" @click="viewLogsScreenToggle(3)">
               X
             </button>
@@ -689,14 +738,15 @@ timer();
               <button class="btn confirmBtnDelete" @click="deleteAccount()">
                 Slet Bruger
               </button>
-              <h5 class="confirmP">You Sure?</h5>
+              <h5 class="confirmP">Er du Sikker?</h5>
               <button class="btn returnBtnDelete" @click="menuScreenToggle(6)">
                 Annuller
               </button>
             </div>
           </div>
-          <div class="logon" v-if="screenOpenStatus == 1 || screenOpenStatus == 4">
+          <div class="logon" v-if="screenOpenStatus == 1 || screenOpenStatus == 4 || screenOpenStatus == 8">
             <div class="logonToUser" v-if="screenOpenStatus == 1">
+              <p class="p descText">Log På</p>
               <button class="btn returnBtn" @click="menuScreenToggle(0)">
                 X
               </button>
@@ -709,7 +759,7 @@ timer();
                 <p class="p">Password</p>
                 <input class="textLogonPassword" type="password" v-model="password" />
               </span>
-              <a v-if="disabledItems" class="passwordResetLink" @click="resetPassword()">Glemt Kodeord?</a>
+              <a class="passwordResetLink" @click="menuScreenToggle(8)">Glemt Kodeord?</a>
               <div class="logonUserBtnContainer">
                 <button class="btn btnLogonUser" @click="loginEmailPassword">
                   Log ind
@@ -719,7 +769,25 @@ timer();
                 </button>
               </div>
             </div>
+
+            <div class="reset" v-if="screenOpenStatus == 8">
+              <p class="p descText">Nulstil Kodeord</p>
+              <button class="btn returnBtn" @click="menuScreenToggle(1)">
+                X
+              </button>
+
+              <span class="inputBox inputNameLogon">
+                <p class="p">Email</p>
+                <input class="textLogonName" type="email" v-model="email" />
+              </span>
+              <div class="resetPasswordBtnContainer">
+                <button class="btn btnResetPassword" @click="resetPassword(), menuScreenToggle(1)">Send Link</button>
+              </div>
+            </div>
+
             <div class="logonCreateUser" v-if="screenOpenStatus == 4">
+              <p class="p descText">Opret Bruger</p>
+
               <button class="btn returnBtn" @click="menuScreenToggle(1)">
                 X
               </button>
@@ -741,11 +809,11 @@ timer();
               </span>
               <span class="inputBox inputTeamCreate">
                 <p class="p">Hold - Valgfri</p>
-                <v-select class="dropdown" v-model="team" :options="_teams" />
+                <v-select class="dropdown test" v-model="team" :options="_teams" />
               </span>
               <span class="createUserBtnContainer">
                 <button class="btn btnSaveNewUser" @click="createAccountEmailPassword">
-                  Tilføj
+                  Opret Bruger
                 </button>
               </span>
             </div>

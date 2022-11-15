@@ -90,7 +90,7 @@ h1 {
   overflow-y: scroll;
 }
 
-.logonUserBtnContainer > .btn:hover, .createUserBtnContainer > .btnSaveNewUser:hover, .addStepsBtnContainer > .addStepsBtn:hover {
+.logonUserBtnContainer > .btn:hover, .createUserBtnContainer > .btnSaveNewUser:hover, .addStepsBtnContainer > .addStepsBtn:hover, .resetPasswordBtnContainer > .btn:hover{
   border: 2px solid #00792c;
 }
 
@@ -142,7 +142,7 @@ h1 {
   .logon_Steps_Container{
     width: 80%;
   }
-  .logonUserBtnContainer > .btn, .createUserBtnContainer > .btn, .addStepsBtnContainer > .btn, .headerBtnContainer > .btn, .deleteUserBtnContainer > .btn{
+  .logonUserBtnContainer > .btn, .createUserBtnContainer > .btn, .addStepsBtnContainer > .btn, .headerBtnContainer > .btn, .deleteUserBtnContainer > .btn, .resetPasswordBtnContainer > .btn{
     height: fit-content;
   }
 }
@@ -425,11 +425,6 @@ body{
   font-style: italic;
 }
 
-.datePick{
-  width: 94%;
-  margin: 7rem auto 0 auto;
-}
-
 .returnBtn{
   position: absolute;
   right: 2rem;
@@ -444,7 +439,7 @@ body{
   margin: 6px;
 }
 
-.btnLogonUser, .redirectCreateUser, .btnSaveNewUser, .addStepsBtn, .btnDeleteUser{
+.btnLogonUser, .redirectCreateUser, .btnSaveNewUser, .addStepsBtn, .btnDeleteUser, .btnResetPassword{
   border: 2px solid #40bf6e;
   margin: 0 2px;
 }
@@ -456,7 +451,7 @@ body{
   height: 2.4rem;
 }
 
-.logonUserBtnContainer, .addStepsBtnContainer, .createUserBtnContainer, .deleteUserBtnContainer{
+.logonUserBtnContainer, .addStepsBtnContainer, .createUserBtnContainer, .deleteUserBtnContainer, .resetPasswordBtnContainer{
   display: flex;
   justify-content: center;
   position: absolute;
@@ -514,4 +509,56 @@ button{
   overflow-y: scroll;
   left: 0;
   right: 0;
+}
+
+.descText{
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  right: 50%;
+  transform: translate(-50%, -0%);
+  background-color: white;
+  width: 10rem;
+  padding: .5rem;
+  font-weight: bold;
+  border: 2px solid #40bf6e;
+  border-radius: 8px;
+}
+
+.reset > .inputNameLogon{
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  left: 10%;
+  right: 10%;
+}
+
+.inputTeamCreate{
+  z-index: 1;
+  bottom: 12%;
+}
+
+.inputClassCreate, .inputTeamCreate{
+  position: absolute;
+  display: block;
+  left: 10%;
+  right: 10%;
+}
+
+.v-select > ul{
+  position: absolute;
+  left: 0;
+  right: 0;
+  max-height: 10rem;
+  overflow-y: auto;
+}
+
+.dp__main{
+  border: 1.8px solid rgb(169, 169, 169) !important;
+  border-radius: 6px;
+  transition: border-color 0.25s;
+}
+
+.dp__main:hover{
+  border-color: rgb(82, 82, 82) !important;
 }
