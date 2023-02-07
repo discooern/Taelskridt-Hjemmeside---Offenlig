@@ -261,7 +261,7 @@ h1 {
   font-size: 1.2rem;
 }
 
-.top5People, .yourTeam, .yourClass, .topClass, .topTeam, .personalStats{
+.top5People, .yourTeam, .yourClass, .topClass, .topTeam, .personalStats, .mostStepsDay{
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -357,7 +357,6 @@ h1 {
 }
 
 .direction-left{
-  white-space: nowrap;
   overflow: hidden;
   text-overflow:ellipsis;
 }

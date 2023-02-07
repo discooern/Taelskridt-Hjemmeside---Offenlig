@@ -10,8 +10,8 @@ import * as Realm from "realm-web";
 import { ContentLoader } from 'vue-content-loader'
 
 // Defines DB Connection
-new Realm.App({ id: "App ID" });
-const app = Realm.getApp("App ID");
+new Realm.App({ id: "App-ID" });
+const app = Realm.getApp("App-ID");
 
 //#region AnonymousLogin
 // At start of App, logs user on anonymously to allow access to DB
@@ -57,6 +57,7 @@ const now = new Date();
 let screenOpenStatus = ref(0);
 let userLogged = ref(false);
 const disabledItems = ref(false);
+let addBtnEnabled = ref(true);
 
 // Ref on variable updates all places where it is used, ex in a calculation
 let user = ref("");
@@ -73,7 +74,7 @@ const error = ref("No");
 let tmpCalcToday = ref(0);
 let userStepsToday = ref(0);
 
-let _teams = ref(["team1", "team2", "team3", "team4", "team5"]);
+let _teams = ref(["The Braunstein's", "Minions", "Koldskål", "team4", "team5"]);
 let _classes = ref([
   "S1",
   "S2",
@@ -92,7 +93,7 @@ let header = ref([
   { text: "Navn", value: "name" },
   { text: "Skridt", value: "steps" },
   { text: "Klasse", value: "class" },
-  { text: "hold", value: "team" },
+  { text: "Hold", value: "team" },
 ]);
 let headerTeam = ref([
   { text: "Navn", value: "teamName" },
@@ -107,6 +108,11 @@ let headerLogs = ref([
   { text: "Beskrivelse", value: "description" },
   { text: "Dato", value: "timeStampByUser" },
 ]);
+let headerLogsDay = ref([
+  { text: "Navn", value: "name" },
+  { text: "Skridt", value: "steps" },
+  { text: "Dato", value: "timeStampByUser" },
+])
 
 // Reactive in a variable is used when updating Objects or lists of items to update all nested properties
 let loggedUser = reactive([1]);
@@ -116,6 +122,8 @@ let itemTeam = reactive([5]);
 let itemTopClass = reactive([5]);
 let itemTopTeam = reactive([5]);
 let itemLogs = reactive([6]);
+let itemLogsDay = reactive([5]);
+let sortTop5DayFinal = reactive([5]);
 
 let popupVisible = ref(false);
 let popupContent = ref("");
@@ -298,6 +306,7 @@ const deleteAccount = async () => {
 };
 
 const createNewStepsLog = async () => {
+  addBtnEnabled.value = false;
   try {
     // opensPopup if credentials are invalid else it runs the code as normal
     if (Number(_steps.value) == 0 || _steps == String) {
@@ -316,7 +325,16 @@ const createNewStepsLog = async () => {
 
       // Updates the current user steps to match the newly added steps including their already existing
       let tmpUser = await usersC.findOne({ userID: app.currentUser.id });
-      let tmpSteps = Number(tmpUser.steps) + Number(_steps.value);
+      // let tmpSteps = Number(tmpUser.steps) + Number(_steps.value);
+
+      let tmpSteps = 0;
+      const getSteps = await logsC.aggregate([
+        { $match: { logUserRefID: app.currentUser.id } },
+      ]);
+      for (let i = 0; i < getSteps.length; i++) {
+        tmpSteps += getSteps[i].steps;
+      }
+
       resp = await usersC.updateOne(
         { userID: app.currentUser.id },
         { $set: { steps: tmpSteps } }
@@ -327,24 +345,50 @@ const createNewStepsLog = async () => {
       // Checks if user is part of a team since the value is nullable
       if (tmpUser.team != null) {
         let userTeam = await teamsC.findOne({ teamName: tmpUser.team });
-        let stepCalc = userTeam.steps + Number(_steps.value);
+
+        let tmpStepsTeam = 0;
+        const getStepsTeam = await usersC.aggregate([
+          { $match: { team: userTeam.teamName } },
+        ]);
+        for (let i = 0; i < getStepsTeam.length; i++) {
+          const tmpStepsTeamUsers = await logsC.aggregate([
+            { $match: { logUserRefID: getStepsTeam[i].userID } },
+          ]);
+          for (let y = 0; y < tmpStepsTeamUsers.length; y++) {
+            tmpStepsTeam += tmpStepsTeamUsers[y].steps
+          }
+        }
+
         resp = await teamsC.updateOne(
           { teamName: tmpUser.team },
-          { $set: { steps: stepCalc } }
+          { $set: { steps: tmpStepsTeam } },
         );
       }
 
       // Updates the class that the current user is a part of to include the newly added steps
       let userClass = await classesC.findOne({ className: tmpUser.class });
-      let stepCalc = userClass.steps + Number(_steps.value);
+
+      let tmpStepsClass = 0;
+      const getStepsClass = await usersC.aggregate([
+        { $match: { class: userClass.className } },
+      ]);
+      for (let i = 0; i < getStepsClass.length; i++) {
+        const tmpStepsClassUsers = await logsC.aggregate([
+          { $match: { logUserRefID: getStepsClass[i].userID } },
+        ]);
+        for (let y = 0; y < tmpStepsClassUsers.length; y++) {
+          tmpStepsClass += tmpStepsClassUsers[y].steps
+        }
+      }
+
       resp = await classesC.updateOne(
         { className: tmpUser.class },
-        { $set: { steps: stepCalc } }
+        { $set: { steps: tmpStepsClass } },
       );
 
       // Sets the variable for progress circle to include newly added steps IF it was added today
       let tmpTime = new Date(timeStampByUser.value);
-      if (tmpTime.getDay() == now.getDay()) {
+      if (tmpTime.getDate() == now.getDate() && tmpTime.getMonth() == now.getMonth() && tmpTime.getFullYear() == now.getFullYear()) {
         userStepsToday.value += Number(_steps.value);
       }
 
@@ -356,6 +400,7 @@ const createNewStepsLog = async () => {
     console.error("Failed to create new log", err);
     error.value = err;
   }
+  addBtnEnabled.value = true;
 };
 //#endregion
 
@@ -389,7 +434,8 @@ const resetPassword = async () => {
     if (email.value == "") {
       openPopup("Kan ikke sende link venligst indtast email");
     } else {
-      await app.emailPasswordAuth.sendResetPasswordEmail(String(email.value));
+      var result = await app.emailPasswordAuth.sendResetPasswordEmail(email);
+      console.log(result);
       menuScreenToggle(0)
     }
   } catch (err) {
@@ -434,6 +480,26 @@ const updateData = async () => {
     { $sort: { steps: -1 } },
     { $limit: 5 },
   ]);
+
+  // const sortTop5StepsDay = await logsC.aggregate([
+  //   { $sort: { steps: -1 } },
+  //   { $group : { _id : "$logUserRefID" } },
+  //   { $limit: 5 },
+  // ]);
+  // for (let i = 0; i < 5; i++){
+  //   let tmp = sortTop5StepsDay[i];
+  //   try {
+  //     sortTop5DayFinal[i] = await logsC.aggregate([
+  //       { $sort: { steps: -1 } },
+  //       { $match: { logUserRefID: tmp._id }},
+  //       { $limit: 1 },
+  //     ])
+  //   }
+  //   catch (err){
+  //     error.value = err;
+  //   }
+  // }
+
   const sortTop5Class = await classesC.aggregate([
     { $sort: { steps: -1 } },
     { $limit: 5 },
@@ -510,6 +576,66 @@ const updateData = async () => {
       error.value = err;
     }
   }
+
+  // sortTop5DayFinal.sort(function (x,y) {
+  //   return x[0].steps - y[0].steps;
+  // });
+  // sortTop5DayFinal.reverse();
+
+  const logs = await logsC.find();
+  let consolidatedEntries = reactive([]);
+
+  for (let i = 0; i < logs.length; i++) {
+    let found = false;
+    for (let y = 0; y < consolidatedEntries.length; y++) {
+      if (logs[i].logUserRefID == consolidatedEntries[y].logUserRefID && logs[i].timeStampByUser.getDate() == consolidatedEntries[y].timeStampByUser.getDate() && logs[i].timeStampByUser.getMonth() == consolidatedEntries[y].timeStampByUser.getMonth() && logs[i].timeStampByUser.getFullYear() == consolidatedEntries[y].timeStampByUser.getFullYear()) {
+        consolidatedEntries[y].steps += logs[i].steps;
+        found = true;
+      }
+    }
+    if (!found) {
+      consolidatedEntries.push(logs[i]);
+    }
+  }
+
+  consolidatedEntries.sort(function (x, y) {
+    return x.steps - y.steps;
+  });
+  consolidatedEntries.reverse();
+
+  // for (let i = 0; i < consolidatedEntries.length; i++) {
+  //   for (let y = i; y < consolidatedEntries.length - i; y++) {
+  //     try {
+  //       if (consolidatedEntries[i].logUserRefID == consolidatedEntries[y].logUserRefID && consolidatedEntries[i] != consolidatedEntries[y]) {
+  //         consolidatedEntries.splice(y, 1);
+  //       }
+  //     }
+  //     catch(err){
+  //       console.log(consolidatedEntries[i] + " " + i);
+  //       console.log(consolidatedEntries[y] + " " + y);
+  //     }
+  //   }
+  // }
+
+  consolidatedEntries = consolidatedEntries.filter((v,i,a)=>a.findIndex(v2=>(v2.logUserRefID===v.logUserRefID))===i);
+
+  for (let i = 0; i < 5; i++) {
+    try {
+      if (consolidatedEntries[i] == null) {
+        break;
+      }
+      let userName = await usersC.findOne({ userID: consolidatedEntries[i].logUserRefID });
+      itemLogsDay[i] = {
+        name: userName.username,
+        steps: consolidatedEntries[i].steps,
+        timeStampByUser: consolidatedEntries[i].timeStampByUser.toDateString("YYYY-MM-DD"),
+      };
+    } catch (err) {
+      console.error("Failed to get top 5 step day", err);
+      error.value = err;
+    }
+  }
+
 
   for (let i = 0; i < 5; i++) {
     try {
@@ -612,6 +738,17 @@ timer();
             <rect x="0" y="40" rx="3" ry="3" width="100%" height=".4rem" />
           </ContentLoader>
         </div>
+        <div class="mainContainer mostStepsDay">
+          <p class="teamP">Flest Skridt på 1 Dag</p>
+          <easy-data-table :headers="headerLogsDay" :items="itemLogsDay" hide-footer alternating />
+          <ContentLoader v-if="itemLogsDay[0].name == null" style="margin: 0 16%" viewBox="0 0 250 60">
+            <rect x="0" y="0" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="10" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="20" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="30" rx="3" ry="3" width="100%" height=".4rem" />
+            <rect x="0" y="40" rx="3" ry="3" width="100%" height=".4rem" />
+          </ContentLoader>
+        </div>
         <div class="mainContainer yourTeam" v-if="userLogged && loggedUser[0].team != null">
           <p class="teamP">Dit Hold</p>
           <easy-data-table :headers="header" :items="itemTeam" hide-footer alternating />
@@ -686,7 +823,7 @@ timer();
               <Datepicker v-model="timeStampByUser" class="datePick"></Datepicker>
             </span>
             <span class="addStepsBtnContainer">
-              <button class="btn addStepsBtn" @click="createNewStepsLog">
+              <button class="btn addStepsBtn" @click="createNewStepsLog" :disabled="!addBtnEnabled">
                 Tilføj
               </button>
             </span>
